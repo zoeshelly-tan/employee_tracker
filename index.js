@@ -89,53 +89,65 @@ function viewAllDepartment() {
 
 
 const addEmployee = () => {
-    inquirer
-        .prompt(
-            {
-                name: "firstName",
-                type: "input",
-                message: "What is the employee's first name?",
-            },
-            {
-                name: "lastName",
-                type: "input",
-                message: "What is the employee's last name?",
-            },
-            {
-                type: 'list',
-                name: 'role',
-                message: 'What role do you want to add?',
-                choices: [
-                    "Lead Software Engineer",
-                    "software Engineer",
-                    "Accountant",
-                    "Lead Accountant",
-                    "Lead Lawyer",
-                    "Lawyer",
-                    "Lead Salesperson",
-                    "Salesperson"],
-            },
-        )
-        .then((answer) => {
-            console.log("adding new employee")
-            con.query = 'INSERT INTO employee SET ?',
-            {
-                first_name: answer.firstName,
-                last_name: answer.lastName,
-            }
-            con.query = "SELECT * FROM ROLE WHERE ?",
-                { role: answer.role },
-                function (err, res) {
-                    if (err) throw err;
-                    console.log("Added")
-                    viewAll();
-                    runQuestion();
-
-
+    connection.query("SELECT * FROM roles", (err, res) => {
+        if (err) throw err;
+        inquirer
+            .prompt([
+                {
+                    name: "firstName",
+                    type: "input",
+                    message: "What is the employee's first name?",
+                },
+                {
+                    name: "lastName",
+                    type: "input",
+                    message: "What is the employee's last name?",
+                },
+                {
+                    name: "managerId",
+                    type: "input",
+                    message: "What is the employee's manager's ID?",
+                },
+                {
+                    name: "roleId",
+                    type: "list",
+                    choices: function () {
+                        var roleArray = [];
+                        for (let i = 0; i < res.length; i++) {
+                            roleArray.push(res[i].title);
+                        }
+                        return roleArray;
+                    },
+                    message: "What is this employee's role?",
+                },
+            ])
+            .then(function (answer) {
+                let role_id;
+                for (let a = 0; a < res.length; a++) {
+                    if (res[a].title == answer.roleId) {
+                        role_id = res[a].id;
+                        console.log(role_id);
+                    }
                 }
-        })
-        .catch(console.error("err"))
-}
+                console.log(answer)
+                connection.query("INSERT INTO employee SET?",
+                    {
+                        firstName: answer.firstName,
+                        lastName: answer.lastName,
+                        manager_id: answer.managerId,
+                        role_id: role_id,
+                    },
+                    function (err) {
+                        if (err) throw err;
+                        console.log("Your employee has been added!");
+                        runQuestion();
+                    }
+                )       
+            });
+    });
+
+};
+
 
 function removeEmployee() {
     viewAll()
@@ -148,10 +160,14 @@ function removeEmployee() {
         .then((answer) => {
             console.log("deleting employee");
             connection.query("DELETE FROM employee WHERE?",
-                {
-                    id: answer.employeeID,
-                },
-                function (err, res) {
+                    {
+                        firstName: answer.firstName,
+                        lastName: answer.lastName,
+                        manager_id: answer.managerId,
+                        role_id: role_id,
+                    },
+                    
+                function (err) {
                     if (err) throw err;
                     console.log("deleted")
                     viewAll();
@@ -194,7 +210,7 @@ const updateRole = () => {
         .then((answer) => {
             console.log("Adding a new role")
             connection.query(
-                `INSERT INTO roles SET ?`,
+                `INSERT INTO roles SET ?`, //update
                 {
                     title: answer.title,
                     salary: answer.salary
@@ -208,37 +224,3 @@ const updateRole = () => {
         })
 };
 
-// const updateManager = () => {
-//     viewAll();
-//     inquirer
-//         .prompt([
-//             {
-//                 name: "employeeID",
-//                 type: "input",
-//                 message: "Please enter the ID of the employee that you want to update."
-//             },
-//             {
-//                 name: "title",
-//                 type: "input",
-//                 message: "What is the role title?",
-//             },
-//             {
-//                 name: "salary",
-//                 type: "input",
-//                 message: "What is this roles salary?",
-//                 validate: function (value) {
-//                     let valid = !isNaN(value);
-//                     return valid || "Please enter a number";
-//                 }
-//             },
-//             {
-//                 name: "department",
-//                 type: "input",
-//                 message: "which department does it belong to?",
-//             }
-//         ])
-//         .then((answer) => {
-//             console.log("updating manager")
-//             connection.query("")
-//         })
-// }

@@ -15,10 +15,10 @@ values('Lead Software Engineer', 240000,1),
 ('Salesperson',20000,4);
 
 
-INSERT INTO employee(first_name, last_name, manager_id, role_id)
-VALUES('Ben','Daniel',1,null),
-('Geo','Wagner',1,0),
-('Ash','Ley',2,1),
-('Gary','Won',2,null),
-('Mary','Mei',3,1),
-('Kol','Ben',3,null);
+INSERT INTO employee(first_name, last_name, manager_id, role_id, id)
+VALUES('Ben','Daniel',1,null,1),
+('Geo','Wagner',1,0,2),
+('Ash','Ley',2,1,3),
+('Gary','Won',2,null,4),
+('Mary','Mei',3,1,5),
+('Kol','Ben',3,null,6);
