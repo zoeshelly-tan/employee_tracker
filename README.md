@@ -10,7 +10,8 @@
 * [License](#License)
 ## Project Links
 * [Github Repo](https://github.com/zoeshelly-tan/employee_tracker)
-* [Walk through video link](https://drive.google.com/file/d/1ggaNNSjuarsoPtP0e-B6bGyxbeD49wPQ/view?usp=sharing)
+* [Walk through video link](https://drive.google.com/file/d/1KA697-IWhRPFCeDlxBFqYR3e14-hrBEo/view?usp=sharing)
+
 
 ## Project Objective
 The project is design to create an application called Employee tracker to allow use to arrange the employee data. 
