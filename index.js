@@ -25,10 +25,11 @@ const runQuestion = () =>
             choices: [
                 "View All Employees",
                 "View All Employees by Department",
+                "View All Roles",
                 "Add Employees",
-                "Remove Employees",
-                "Update Employee Role",
-                "Update Employee Manager"]
+                "Add Department",
+                "Add Role",
+                ]
         }
         )
         .then((answer) => {
@@ -41,21 +42,23 @@ const runQuestion = () =>
                     viewAllDepartment();
                     break;
 
+                case 'View All Roles':
+                    viewAllRole();
+                    break;
+
                 case 'Add Employees':
                     addEmployee();
                     break;
 
-                case 'Remove Employees':
-                    removeEmployee();
+                case 'Add Department':
+                    addDepartment();
                     break;
 
-                case 'Update Employee Role':
-                    updateRole();
+                    case 'Add Role':
+                    addRole();
                     break;
 
-                case 'Update Employee Manager':
-                    updateManager();
-                    break;
+              
             }
 
         })
@@ -86,7 +89,15 @@ function viewAllDepartment() {
     });
 }
 
-
+function viewAllRole() {
+    let query = "SELECT * FROM roles";
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        console.log("roles list")
+        console.table(res);
+        runQuestion();
+    });
+}
 
 const addEmployee = () => {
     connection.query("SELECT * FROM roles", (err, res) => {
@@ -142,85 +153,78 @@ const addEmployee = () => {
                         console.log("Your employee has been added!");
                         runQuestion();
                     }
-                )       
+                )
             });
     });
 
 };
 
-
-function removeEmployee() {
-    viewAll()
-    inquirer
-        .prompt({
-            name: "employeeID",
-            type: "input",
-            message: "Please enter the ID of the employee that you want to delete."
-        })
-        .then((answer) => {
-            console.log("deleting employee");
-            connection.query("DELETE FROM employee WHERE?",
-                    {
-                        firstName: answer.firstName,
-                        lastName: answer.lastName,
-                        manager_id: answer.managerId,
-                        role_id: role_id,
-                    },
-                    
-                function (err) {
-                    if (err) throw err;
-                    console.log("deleted")
-                    viewAll();
-                    runQuestion();
-
-                })
-        })
-        .catch(console.error("err"))
-};
-
-const updateRole = () => {
-    viewAll();
-    inquirer
-        .prompt([
-            {
-                name: "employeeID",
-                type: "input",
-                message: "Please enter the ID of the employee that you want to update."
-            },
-            {
-                name: "title",
-                type: "input",
-                message: "What is the role title?",
-            },
-            {
-                name: "salary",
-                type: "input",
-                message: "What is this roles salary?",
-                validate: function (value) {
-                    let valid = !isNaN(value);
-                    return valid || "Please enter a number";
-                }
-            },
-            {
-                name: "department",
-                type: "input",
-                message: "which department does it belong to?",
-            }
-        ])
-        .then((answer) => {
-            console.log("Adding a new role")
-            connection.query(
-                `INSERT INTO roles SET ?`, //update
+function addDepartment() {
+    connection.query('SELECT deptname FROM department;', (err, res) => {
+        if (err) throw err;
+        inquirer
+            .prompt([
                 {
-                    title: answer.title,
-                    salary: answer.salary
+                    name: "deptname",
+                    type: "input",
+                    message: "What is the New department name?",
                 },
-                function (err, res) {
-                    if (err) throw err;
-                    console.log("Added")
-                    viewAll()
-                }
-            )
-        })
-};
+            ])
+            .then(function (answer) {
+                console.log(answer)
+                connection.query("INSERT INTO department SET?",
+                    {
+                        deptname: answer.deptname,
+                    },
+                    function (err) {
+                        if (err) throw err;
+                        console.log("Your new department has been added!");
+                        runQuestion();
+                    }
+                )
+            });
+    });
+}
+
+function addRole() {
+    connection.query('SELECT * FROM roles;', (err, res) => {
+        if (err) throw err;
+        inquirer
+            .prompt([
+                {
+                    name: "title",
+                    type: "input",
+                    message: "What is the New title name?",
+                },
+                {
+                    name: 'salary',
+                    type: 'input',
+                    message: 'What would you like the role salary to be?'
+                  },
+                  {
+                      name: 'departmentId',
+                    type: 'input',
+                    message: 'Enter department id you want the role to belong to'
+                  }
+            ])
+            .then(function (answer) {
+                console.log(answer)
+                connection.query("INSERT INTO roles SET?",
+                    {
+                        title: answer.title,
+                        salary: answer.salary,
+                        department_id: answer.departmentId
+                    },
+                    function (err) {
+                        if (err) throw err;
+                        console.log("Your new roles has been added!");
+                        runQuestion();
+                    }
+                )
+            });
+    });
+}
+
+
+
 
